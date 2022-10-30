@@ -1,0 +1,115 @@
+connectors:
+  # [Lenze 1]
+  # http://www.mycncuk.com/threads/13959-Boxford-TCL-125?p=119876#post119876 seems to be the manual, tbc.
+  # Lenze 534_E 3A.
+  # (The driver in the machine is a 534 E 1, the manual is for a 534 E 3A, don't think it's a major difference)
+
+  spindledriver_bottom_left:
+    # [lenze 1 p 15]
+    # _3/_4 is tacho (DC or AC with rectification)
+    # [lenze 1 s 5.3]
+    # jumper between _2 and _4 for speed control with IxR compensation.
+    # [lenze 1 s 6.1]
+    # _16 shorted to _17 for on, open for off.
+    # OR
+    # 16 & 17 always shorted.  Short both to 7 for off, 7 open for on.
+    # [lenze 1 p 23]
+    # Unclear, but variable resistor between 7 (ground?) and 9 (vcc?) to 8 (speed?)
+    # OR
+    # 0-10v signal, pin 7 neg pin 8 positive.
+    type: screwterminal
+    color: BG
+    notes: Pin labeling does not match numbering!
+    pinlabels: ["_2", "_3", "_4", "_7", "_8", "_9", "_16", "_17"]
+    # done-wires
+  spindledriver_bottom_right:
+    # [lenze 1 p 15]
+    # A/B is +/- for armature voltage.
+    # I/K is +/- for excitation voltage (not used with perm magnet motor)
+    type: screwterminal
+    color: BG
+    # 
+    pinlabels: ['L1', 'N', 'A', 'B', 'I', 'K']
+    # done-wires
+  spindledriver_front_6pin:
+    type: screwterminal
+    color:  GN
+    pinlabels: ['_1', '_2', '-10v', '_4', '_5', '10v']
+    # done-wires
+  spindledriver_front_3pin:
+    type: screwterminal
+    color: GN
+    pinlabels: ['A', 'B', 'C']
+    # done-wires
+  unk:
+    style: simple
+    autogenerate: true
+    type: "???"
+
+  mains_filter:
+    # https://octopart.com/datasheet/l2140%2F6l-belling+lee-7477526
+    type: 'belling lee'
+    subtype: 'L2140/6L'
+    pinlabels: ['app_L', 'app_E', 'app_N', 'mains_L', 'mains_N']
+
+  big_orange:
+    pincount: 15
+    # pin 1 arbitrary, now marked with black whiteboard marker.
+    # rd, rd, rd, rd, rd jump 1, rd jump 2, tiny orange, tiny red(?), red, black, grey, grye, black, red, grye
+    # tiny red(?) is broken off, but clearly went there.
+
+cables:
+  spindledriver_jumper_short:
+    category: bundle
+    show_name: false
+    colors: ['RD', 'RD']
+  spindledriver_jumper_long:
+    category: bundle
+    show_name: false
+    colors: ['GNYE', 'GY', 'RD']
+  a:
+    category: bundle
+    #color: ['RD']
+    colors: ['RD', 'BK', 'BU', 'WH']
+  b:
+    category: bundle
+    colors: ['RD', 'BK', 'GY', 'YEGN']
+
+connections:
+  # jumper wires from spindledriver_bottom_left to itself.
+  - 
+    - spindledriver_bottom_left: [_2, _16] 
+    - spindledriver_jumper_short: [1-2]
+    - spindledriver_bottom_left: [_4, _17]
+
+  # and from the bottom to the front
+  -
+    - spindledriver_bottom_left: [_7, _8, _9]
+    - spindledriver_jumper_long: [1-3]
+    - spindledriver_front_3pin: ['C', 'B', 'A']
+  
+  -
+    - spindledriver_bottom_right: ['L1', 'N', 'A', 'B']
+    - a: [1, 2, 3, 4]
+    - [unk, unk, unk, unk]
+
+  - 
+   - spindledriver_front_6pin: [_1, _2, _4, _5]
+   - b: [1,2,3,4]
+   - unk
+
+# bigass cap, 
+#  + has two red wires
+#    one to the rectifier bottom right, one to elsewhere.
+#  - has 5 GRYE
+#    one to rectifier top-left
+# rectifier:
+#  bottom-left to big fuse holder right
+#  top-right to xformer long topmost
+# big fuse holder, 10A
+#  left to xformer long 2nd from top
+# L1 of spindle controller to big orange 14
+# N  of spindle controller to big orange 13
+# A  of spindle controller to relay left upper 2nd from far
+# B  of spindle controller to relay left upper far
+# 
