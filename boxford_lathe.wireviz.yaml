@@ -21,6 +21,7 @@ connectors:
     color: BG
     notes: Pin labeling does not match numbering!
     pinlabels: ["_2", "_3", "_4", "_7", "_8", "_9", "_16", "_17"]
+    loops: [[1, 3], [7, 8]]
     # done-wires
   spindledriver_bottom_right:
     # [lenze 1 p 15]
@@ -58,12 +59,74 @@ connectors:
     # rd, rd, rd, rd, rd jump 1, rd jump 2, tiny orange, tiny red(?), red, black, grey, grye, black, red, grye
     # tiny red(?) is broken off, but clearly went there.
 
+  bigass_cap:
+    pincount: 2
+    pinlabels: ['-', '+']
+
+  rectifier:
+    # KBPC2502
+    pincount: 4
+    pinlabels: ['-', '~a', '~b', '+']
+
+  fuse_holder:
+    # 10A
+    pincount: 2
+
+  relay:
+    # RHK214B
+    # For now, at least, numbering is 
+    #  far-near
+    #  lower left (1-4), 
+    #  upper left (5-8), 
+    #  upper right (9-12), 
+    #  lower right (13-16)
+    # pin names are established, but pin numbering & location isn't at present
+    pincount: 16
+    # pinlabels: ['A1', 'A2', # set
+    #   # for each pole, x1 is common, "set" is x2, "reset" is x4
+    #   '_11', '_12', '_14',
+    #   '_21', '_22', '_24',
+    #   '_31', '_32', '_34',
+    #   '_41', '_42', '_44',
+    #   'B1', 'B2' # reset
+    # ]
+    # colors of wires, for not-yet-traced
+    pincolors: 
+      - RD
+      - RD
+      - RD
+      - RD
+
+      - WT 
+      - BU
+      - x
+      - RD
+
+      - BU
+      - BK
+      - x
+      - BU # thin
+
+      - 
+  xformer_long:
+    # Pins numbered from top to bottom
+    pincount: 8
+    # These are labeled, but the label is mostly invisible under the wires...
+    # What can be read:
+    # 1: 20V
+    # 2: 8A
+    # 3: 10V
+    # Also, each "pin's" color is given here as the
+    # color of the wire going to the winding.
+    # (Or will be, once I get around to it.)
+
+
 cables:
-  spindledriver_jumper_short:
+  sjs:
     category: bundle
     show_name: false
     colors: ['RD', 'RD']
-  spindledriver_jumper_long:
+  sjl:
     category: bundle
     show_name: false
     colors: ['GNYE', 'GY', 'RD']
@@ -74,42 +137,64 @@ cables:
   b:
     category: bundle
     colors: ['RD', 'BK', 'GY', 'YEGN']
+  c:
+    category: bundle
+    colors: ['YEGN', 'RD']
+  d:
+    category: bundle
+    colors: ['RD']
+  e:
+    category: bundle
+    colors: ['RD']
+  f:
+    category: bundle
+    colors: ['RD']
+    wirecount: 1
 
 connections:
   # jumper wires from spindledriver_bottom_left to itself.
-  - 
-    - spindledriver_bottom_left: [_2, _16] 
-    - spindledriver_jumper_short: [1-2]
-    - spindledriver_bottom_left: [_4, _17]
+  #- 
+  #  - spindledriver_bottom_left: [_2, _16] 
+  #  - sjs: [1-2]
+  #  - spindledriver_bottom_left: [_4, _17]
 
   # and from the bottom to the front
   -
     - spindledriver_bottom_left: [_7, _8, _9]
-    - spindledriver_jumper_long: [1-3]
+    - sjl: [1-3]
     - spindledriver_front_3pin: ['C', 'B', 'A']
   
-  -
-    - spindledriver_bottom_right: ['L1', 'N', 'A', 'B']
-    - a: [1, 2, 3, 4]
-    - [unk, unk, unk, unk]
-
   - 
    - spindledriver_front_6pin: [_1, _2, _4, _5]
    - b: [1,2,3,4]
    - unk
 
-# bigass cap, 
-#  + has two red wires
-#    one to the rectifier bottom right, one to elsewhere.
-#  - has 5 GRYE
-#    one to rectifier top-left
-# rectifier:
-#  bottom-left to big fuse holder right
-#  top-right to xformer long topmost
-# big fuse holder, 10A
-#  left to xformer long 2nd from top
-# L1 of spindle controller to big orange 14
-# N  of spindle controller to big orange 13
-# A  of spindle controller to relay left upper 2nd from far
-# B  of spindle controller to relay left upper far
-# 
+  -
+   - bigass_cap: ['-', '+']
+   - c: [1, 2]
+   - rectifier: ['-', '+']
+
+  -
+    - rectifier: '~a'
+    - d: 1
+    - fuse_holder: 2
+
+  -
+    - rectifier: '~b'
+    - e: 1
+    - xformer_long: 1
+
+  -
+    - fuse_holder: 1
+    - f: 1
+    - xformer_long: 2
+
+  -
+    - spindledriver_bottom_right: ['L1', 'N']
+    - a: [1, 2]
+    - big_orange: [14, 13]
+
+  -
+    - spindledriver_bottom_right: ['A', 'B']
+    - a: [3, 4]
+    - relay: [6, 5]
